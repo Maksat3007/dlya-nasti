@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Для Насти</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Marck+Script&display=swap" rel="stylesheet">
+<style>
+/* VOICE: tender, quiet, one love note
+   IDEA: a bouquet handed over at night — the page is the gift itself
+   PICTURE: flowers growing up from the bottom, petals drifting down
+   COLOUR and TYPE: deep wine night, rose pink, warm gold; Marck Script + Cormorant
+   LAYOUT: one screen, message centred above the bouquet */
+:root{color-scheme:dark;--bg:#2a0c18;--bg2:#4a1428;--ink:#fbe9ee;--rose:#ff6f91;--rose2:#ffb3c6;--gold:#ffd58a;--leaf:#3f8f5a}
+*{box-sizing:border-box;min-width:0}
+html,body{height:100%}
+body{margin:0;color:var(--ink);font:17px/1.55 "Cormorant Garamond",Georgia,serif;overflow:hidden;
+  background:radial-gradient(120% 80% at 50% 100%,var(--bg2) 0%,var(--bg) 60%,#16050c 100%);-webkit-tap-highlight-color:transparent;cursor:pointer}
+.stars,.petals,.fx{position:fixed;inset:0;pointer-events:none}
+.star{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;opacity:.5;animation:tw 3s ease-in-out infinite}
+@keyframes tw{50%{opacity:.1}}
+main{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;align-items:center;padding:clamp(28px,7vh,80px) 20px 0;text-align:center}
+.from{font:400 clamp(20px,3.4vw,26px)/1.2 "Cormorant Garamond",serif;font-style:italic;color:var(--rose2);opacity:0;animation:up 1.4s 2.2s ease forwards}
+h1{margin:.2em 0 .25em;font:400 clamp(38px,8vw,72px)/1.08 "Marck Script",cursive;text-wrap:balance;color:var(--ink);
+  text-shadow:0 0 24px rgba(255,111,145,.55);opacity:0;animation:up 1.6s 2.8s ease forwards}
+.note{max-width:30em;font-size:clamp(17px,2.4vw,20px);color:#f3cdd8;opacity:0;animation:up 1.6s 3.8s ease forwards}
+.hint{position:fixed;bottom:14px;left:0;right:0;z-index:3;text-align:center;font-size:14px;font-style:italic;color:rgba(255,220,230,.55);opacity:0;animation:up 1s 6s ease forwards}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.garden{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(720px,118vw);height:min(56vh,520px);z-index:1}
+.garden svg{width:100%;height:100%;overflow:visible}
+.stem{fill:none;stroke:var(--leaf);stroke-width:5;stroke-linecap:round;stroke-dasharray:600;stroke-dashoffset:600;animation:grow 2s ease-out forwards}
+.leaf{fill:var(--leaf);transform-box:fill-box;transform:scale(0);animation:pop 1s ease-out forwards}
+.head{transform-box:fill-box;transform-origin:center;transform:scale(0);animation:bloom 1.4s cubic-bezier(.2,1.4,.4,1) forwards}
+.sway{transform-box:view-box;animation:sway 6s ease-in-out infinite}
+@keyframes grow{to{stroke-dashoffset:0}}
+@keyframes pop{to{transform:scale(1)}}
+@keyframes bloom{to{transform:scale(1)}}
+@keyframes sway{0%,100%{transform:rotate(-1.2deg)}50%{transform:rotate(1.2deg)}}
+.petal{position:absolute;top:-30px;width:14px;height:11px;border-radius:70% 0 70% 0;background:linear-gradient(135deg,var(--rose2),var(--rose));opacity:.85;animation:fall linear forwards}
+@keyframes fall{to{transform:translate(var(--dx),110vh) rotate(var(--r))}}
+.heart{position:absolute;font-size:22px;color:var(--rose);animation:float 1.6s ease-out forwards}
+@keyframes float{to{transform:translate(var(--dx),-120px) scale(1.6);opacity:0}}
+@media(max-width:600px){.garden{height:50vh}main{padding-top:6vh}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01s!important;animation-delay:0s!important}.petal{display:none}}
+</style>
+</head>
+<body>
+<div class="stars" id="stars"></div>
+<div class="petals" id="petals"></div>
+<main>
+  <div class="from">От Мурата</div>
+  <h1>Насте — самой прекрасной на этом свете</h1>
+  <p class="note">Настя, с того дня, как я встретил тебя, мир стал ярче. Эти цветы — лишь маленькая часть того, что я чувствую. Пусть каждый твой день будет таким же красивым, как ты.</p>
+</main>
+<div class="garden"><svg viewBox="0 0 720 520" id="g" aria-label="Букет цветов"></svg></div>
+<div class="fx" id="fx"></div>
+<div class="hint">коснись экрана ♡</div>
+
+<script>
+{
+  const svg=document.getElementById('g');
+  const NS='http://www.w3.org/2000/svg';
+  // flower: x of base, top position, colour pair, delay, kind
+  const F=[
+    {x:360,tx:360,ty:110,c:['#ff6f91','#ffb3c6'],d:0.2,k:'rose',s:1.25},
+    {x:350,tx:250,ty:170,c:['#ffb3c6','#fff0f4'],d:0.5,k:'daisy',s:1},
+    {x:370,tx:470,ty:165,c:['#e83e6b','#ff8fab'],d:0.7,k:'rose',s:1.05},
+    {x:345,tx:160,ty:260,c:['#ffd58a','#fff1cf'],d:1.0,k:'tulip',s:.95},
+    {x:375,tx:565,ty:255,c:['#ff8fab','#ffd1dc'],d:1.1,k:'tulip',s:.95},
+    {x:355,tx:300,ty:265,c:['#ffffff','#ffe3ea'],d:1.3,k:'daisy',s:.8},
+    {x:365,tx:425,ty:280,c:['#ff6f91','#ffc2d1'],d:1.4,k:'daisy',s:.8},
+    {x:350,tx:95,ty:360,c:['#e83e6b','#ff8fab'],d:1.6,k:'rose',s:.75},
+    {x:370,tx:630,ty:355,c:['#ffb3c6','#fff0f4'],d:1.7,k:'rose',s:.75}
+  ];
+  const el=(t,a)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e};
+  const defs=el('defs',{});
+  defs.innerHTML='<radialGradient id="glow"><stop offset="0" stop-color="#ff6f91" stop-opacity=".35"/><stop offset="1" stop-color="#ff6f91" stop-opacity="0"/></radialGradient>';
+  svg.appendChild(defs);
+  svg.appendChild(el('ellipse',{cx:360,cy:470,rx:320,ry:120,fill:'url(#glow)'}));
+  const wrap=el('g',{class:'sway',style:'transform-origin:360px 520px'});
+  svg.appendChild(wrap);
+
+  function head(f){
+    const g=el('g',{class:'head',style:`animation-delay:${f.d+1.4}s`});
+    const [a,b]=f.c, s=f.s;
+    if(f.k==='rose'){
+      for(let i=0;i<8;i++)g.appendChild(el('ellipse',{cx:f.tx,cy:f.ty-20*s,rx:15*s,ry:26*s,fill:a,opacity:.9,transform:`rotate(${i*45} ${f.tx} ${f.ty})`}));
+      for(let i=0;i<5;i++)g.appendChild(el('ellipse',{cx:f.tx,cy:f.ty-11*s,rx:10*s,ry:16*s,fill:b,opacity:.85,transform:`rotate(${i*72+20} ${f.tx} ${f.ty})`}));
+      g.appendChild(el('circle',{cx:f.tx,cy:f.ty,r:8*s,fill:a}));
+      g.appendChild(el('path',{d:`M${f.tx-5*s} ${f.ty} q${5*s} ${-9*s} ${10*s} 0`,fill:'none',stroke:b,'stroke-width':2}));
+    }else if(f.k==='daisy'){
+      for(let i=0;i<12;i++)g.appendChild(el('ellipse',{cx:f.tx,cy:f.ty-24*s,rx:7*s,ry:22*s,fill:a,transform:`rotate(${i*30} ${f.tx} ${f.ty})`}));
+      g.appendChild(el('circle',{cx:f.tx,cy:f.ty,r:11*s,fill:'#ffd58a'}));
+      g.appendChild(el('circle',{cx:f.tx-3*s,cy:f.ty-3*s,r:4*s,fill:'#fff1cf'}));
+    }else{
+      const x=f.tx,y=f.ty;
+      g.appendChild(el('path',{d:`M${x-26*s} ${y-8*s} Q${x-30*s} ${y+30*s} ${x} ${y+32*s} Q${x+30*s} ${y+30*s} ${x+26*s} ${y-8*s} L${x+13*s} ${y+6*s} L${x} ${y-14*s} L${x-13*s} ${y+6*s}Z`,fill:a}));
+      g.appendChild(el('path',{d:`M${x-12*s} ${y+4*s} Q${x} ${y-30*s} ${x+12*s} ${y+4*s} Q${x} ${y+26*s} ${x-12*s} ${y+4*s}Z`,fill:b,opacity:.8}));
+    }
+    return g;
+  }
+  F.forEach(f=>{
+    const by=520, cy=(by+f.ty)/2, cx=(f.x+f.tx)/2+(f.tx-f.x)*.15;
+    const endY=f.ty+(f.k==='tulip'?30*f.s:8);
+    wrap.appendChild(el('path',{class:'stem',d:`M${f.x} ${by} Q${cx} ${cy} ${f.tx} ${endY}`,style:`animation-delay:${f.d}s`}));
+    const lx=(f.x+cx)/2, ly=(by+cy)/2, dir=f.tx<f.x?-1:1;
+    wrap.appendChild(el('path',{class:'leaf',d:`M${lx} ${ly} q${dir*30} -26 ${dir*52} -8 q${-dir*26} 22 ${-dir*52} 8z`,style:`animation-delay:${f.d+.9}s`}));
+    wrap.appendChild(head(f));
+  });
+  // ribbon around the stems
+  const rib=el('g',{class:'leaf',style:'animation-delay:2.6s'});
+  rib.innerHTML='<path d="M330 470 Q360 480 390 470 L392 492 Q360 500 328 492Z" fill="#ffd58a"/><path d="M360 482 q-40 10 -50 40 q30 -6 50 -36z M360 482 q40 10 50 40 q-30 -6 -50 -36z" fill="#f2b85c"/><circle cx="360" cy="482" r="7" fill="#ffe7b3"/>';
+  wrap.appendChild(rib);
+
+  // stars
+  const st=document.getElementById('stars');
+  st.innerHTML=Array.from({length:70},()=>`<i class="star" style="left:${Math.random()*100}%;top:${Math.random()*60}%;animation-delay:${Math.random()*3}s;transform:scale(${.5+Math.random()})"></i>`).join('');
+
+  // falling petals
+  const pt=document.getElementById('petals');
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function petal(){
+    const p=document.createElement('i');p.className='petal';
+    const dur=7+Math.random()*6;
+    p.style.cssText=`left:${Math.random()*100}%;--dx:${(Math.random()*160-80)}px;--r:${Math.random()*720-360}deg;animation-duration:${dur}s;transform:scale(${.6+Math.random()*.8})`;
+    pt.appendChild(p);setTimeout(()=>p.remove(),dur*1000);
+  }
+  if(!reduce){setTimeout(()=>{for(let i=0;i<6;i++)petal();setInterval(petal,650)},3000)}
+
+  // tap: hearts
+  const fx=document.getElementById('fx');
+  document.addEventListener('pointerdown',e=>{
+    for(let i=0;i<6;i++){
+      const h=document.createElement('span');h.className='heart';h.textContent='♥';
+      h.style.cssText=`left:${e.clientX-10}px;top:${e.clientY-14}px;--dx:${Math.random()*120-60}px;animation-delay:${i*.06}s;color:${['#ff6f91','#ffb3c6','#ffd58a'][i%3]}`;
+      fx.appendChild(h);setTimeout(()=>h.remove(),2000);
+    }
+    if(!reduce)for(let i=0;i<4;i++)petal();
+  });
+}
+</script>
+</body>
+</html>

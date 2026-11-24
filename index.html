@@ -8,61 +8,146 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Marck+Script&display=swap" rel="stylesheet">
 <style>
-/* VOICE: tender, quiet, one love note
-   IDEA: a bouquet handed over at night — the page is the gift itself
-   PICTURE: flowers growing up from the bottom, petals drifting down
+/* VOICE: tender, quiet, one love letter
+   IDEA: a sealed envelope that opens into a night garden and a letter
+   PICTURE: bouquet growing from the bottom, a heart of stars, drifting petals
    COLOUR and TYPE: deep wine night, rose pink, warm gold; Marck Script + Cormorant
-   LAYOUT: one screen, message centred above the bouquet */
+   LAYOUT: envelope first; then one screen — letter above, bouquet below */
 :root{color-scheme:dark;--bg:#2a0c18;--bg2:#4a1428;--ink:#fbe9ee;--rose:#ff6f91;--rose2:#ffb3c6;--gold:#ffd58a;--leaf:#3f8f5a}
 *{box-sizing:border-box;min-width:0}
 html,body{height:100%}
 body{margin:0;color:var(--ink);font:17px/1.55 "Cormorant Garamond",Georgia,serif;overflow:hidden;
-  background:radial-gradient(120% 80% at 50% 100%,var(--bg2) 0%,var(--bg) 60%,#16050c 100%);-webkit-tap-highlight-color:transparent;cursor:pointer}
+  background:radial-gradient(120% 80% at 50% 100%,var(--bg2) 0%,var(--bg) 60%,#16050c 100%);-webkit-tap-highlight-color:transparent}
 .stars,.petals,.fx{position:fixed;inset:0;pointer-events:none}
+.fx{z-index:9}
 .star{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;opacity:.5;animation:tw 3s ease-in-out infinite}
+.hstar{position:absolute;width:3px;height:3px;border-radius:50%;background:#ffe3ea;box-shadow:0 0 6px 2px rgba(255,150,180,.7);opacity:0;transition:opacity 1s}
+.open .hstar{opacity:1}
 @keyframes tw{50%{opacity:.1}}
-main{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;align-items:center;padding:clamp(28px,7vh,80px) 20px 0;text-align:center}
-.from{font:400 clamp(20px,3.4vw,26px)/1.2 "Cormorant Garamond",serif;font-style:italic;color:var(--rose2);opacity:0;animation:up 1.4s 2.2s ease forwards}
-h1{margin:.2em 0 .25em;font:400 clamp(38px,8vw,72px)/1.08 "Marck Script",cursive;text-wrap:balance;color:var(--ink);
-  text-shadow:0 0 24px rgba(255,111,145,.55);opacity:0;animation:up 1.6s 2.8s ease forwards}
-.note{max-width:30em;font-size:clamp(17px,2.4vw,20px);color:#f3cdd8;opacity:0;animation:up 1.6s 3.8s ease forwards}
-.hint{position:fixed;bottom:14px;left:0;right:0;z-index:3;text-align:center;font-size:14px;font-style:italic;color:rgba(255,220,230,.55);opacity:0;animation:up 1s 6s ease forwards}
+
+/* envelope */
+#intro{position:fixed;inset:0;z-index:10;display:grid;place-items:center;align-content:center;gap:22px;cursor:pointer;transition:opacity 1.2s,visibility 1.2s}
+.open #intro{opacity:0;visibility:hidden}
+.env{position:relative;width:min(300px,78vw);aspect-ratio:3/2;background:#f6dde3;border-radius:6px;box-shadow:0 20px 50px rgba(0,0,0,.5);animation:bob 3s ease-in-out infinite}
+.env::before{content:"";position:absolute;inset:0;background:linear-gradient(to top right,#efcbd4 50%,transparent 50.5%) left/50% 100% no-repeat,linear-gradient(to top left,#efcbd4 50%,transparent 50.5%) right/50% 100% no-repeat;border-radius:6px}
+.flap{position:absolute;left:0;right:0;top:0;height:60%;background:#e9bcc8;clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:top;transition:transform .8s}
+.opening .flap{transform:rotateX(180deg)}
+.seal{position:absolute;left:50%;top:60%;width:52px;height:52px;margin:-26px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ff5f86,#b3173f);display:grid;place-items:center;color:#ffd0dc;font-size:24px;box-shadow:0 4px 10px rgba(0,0,0,.35)}
+.to{font:400 clamp(34px,7vw,48px)/1 "Marck Script",cursive;color:var(--ink);text-shadow:0 0 20px rgba(255,111,145,.6)}
+.tap{font-style:italic;color:var(--rose2);animation:pulse 2s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-8px)}}
+@keyframes pulse{50%{opacity:.45}}
+
+/* letter */
+main{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;align-items:center;padding:clamp(22px,5vh,64px) 20px 0;text-align:center}
+.from,h1,.line,.ask{opacity:0}
+.open .from{animation:up 1.4s 1.8s ease forwards}
+.open h1{animation:up 1.6s 2.4s ease forwards}
+.from{font:italic 400 clamp(20px,3.4vw,26px)/1.2 "Cormorant Garamond",serif;color:var(--rose2)}
+h1{margin:.15em 0 .3em;font:400 clamp(36px,7.5vw,68px)/1.08 "Marck Script",cursive;text-wrap:balance;text-shadow:0 0 24px rgba(255,111,145,.55)}
+.letter{max-width:31em;font-size:clamp(17px,2.3vw,20px);color:#f3cdd8;min-height:7.5em}
+.line{margin:0 0 .35em}
+.line.show{animation:up 1.4s ease forwards}
+.ask{margin-top:6px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.ask.show{animation:up 1.2s ease forwards}
+button{font:600 17px/1 "Cormorant Garamond",serif;color:#2a0c18;background:linear-gradient(135deg,var(--rose2),var(--rose));border:0;border-radius:999px;padding:13px 26px;min-height:44px;cursor:pointer;box-shadow:0 6px 24px rgba(255,111,145,.45)}
+button:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.answer{font:400 clamp(26px,4.5vw,34px)/1.1 "Marck Script",cursive;color:var(--gold);min-height:1.2em}
+.mute{position:fixed;top:12px;right:12px;z-index:11;width:44px;height:44px;padding:0;border-radius:50%;background:rgba(255,255,255,.1);color:var(--rose2);font-size:18px;box-shadow:none;display:none}
+.open .mute{display:block}
 @keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-.garden{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(720px,118vw);height:min(56vh,520px);z-index:1}
+
+.garden{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(720px,118vw);height:min(46vh,460px);z-index:1;pointer-events:none}
 .garden svg{width:100%;height:100%;overflow:visible}
 .stem{fill:none;stroke:var(--leaf);stroke-width:5;stroke-linecap:round;stroke-dasharray:600;stroke-dashoffset:600;animation:grow 2s ease-out forwards}
 .leaf{fill:var(--leaf);transform-box:fill-box;transform:scale(0);animation:pop 1s ease-out forwards}
 .head{transform-box:fill-box;transform-origin:center;transform:scale(0);animation:bloom 1.4s cubic-bezier(.2,1.4,.4,1) forwards}
-.sway{transform-box:view-box;animation:sway 6s ease-in-out infinite}
+.sway{animation:sway 6s ease-in-out infinite}
 @keyframes grow{to{stroke-dashoffset:0}}
 @keyframes pop{to{transform:scale(1)}}
 @keyframes bloom{to{transform:scale(1)}}
 @keyframes sway{0%,100%{transform:rotate(-1.2deg)}50%{transform:rotate(1.2deg)}}
 .petal{position:absolute;top:-30px;width:14px;height:11px;border-radius:70% 0 70% 0;background:linear-gradient(135deg,var(--rose2),var(--rose));opacity:.85;animation:fall linear forwards}
 @keyframes fall{to{transform:translate(var(--dx),110vh) rotate(var(--r))}}
-.heart{position:absolute;font-size:22px;color:var(--rose);animation:float 1.6s ease-out forwards}
-@keyframes float{to{transform:translate(var(--dx),-120px) scale(1.6);opacity:0}}
-@media(max-width:600px){.garden{height:50vh}main{padding-top:6vh}}
+.heart{position:absolute;font-size:22px;animation:float 1.6s ease-out forwards}
+@keyframes float{to{transform:translate(var(--dx),var(--dy,-120px)) scale(1.6);opacity:0}}
+@media(max-width:600px){.garden{height:40vh}.letter{min-height:9em}}
+@media(max-height:640px){.garden{height:34vh}}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01s!important;animation-delay:0s!important}.petal{display:none}}
 </style>
 </head>
 <body>
 <div class="stars" id="stars"></div>
 <div class="petals" id="petals"></div>
+
+<div id="intro" role="button" tabindex="0" aria-label="Открыть письмо">
+  <div class="to">Насте</div>
+  <div class="env"><div class="flap"></div><div class="seal">♥</div></div>
+  <div class="tap">нажми, чтобы открыть</div>
+</div>
+
+<button class="mute" id="mute" aria-label="Выключить музыку">♪</button>
+
 <main>
   <div class="from">От Мурата</div>
   <h1>Насте — самой прекрасной на этом свете</h1>
-  <p class="note">Настя, с того дня, как я встретил тебя, мир стал ярче. Эти цветы — лишь маленькая часть того, что я чувствую. Пусть каждый твой день будет таким же красивым, как ты.</p>
+  <div class="letter" id="letter">
+    <p class="line">Настя, с того дня, как я встретил тебя, мир стал ярче.</p>
+    <p class="line">Я ловлю себя на том, что улыбаюсь, просто вспоминая твой голос.</p>
+    <p class="line">Эти цветы — лишь маленькая часть того, что я к тебе чувствую.</p>
+    <p class="line">Если бы звёзды могли говорить, они бы сложились в твоё имя.</p>
+    <div class="ask" id="ask">
+      <button id="smile">Нажми, если улыбнулась ♡</button>
+      <div class="answer" id="answer"></div>
+    </div>
+  </div>
 </main>
+
 <div class="garden"><svg viewBox="0 0 720 520" id="g" aria-label="Букет цветов"></svg></div>
 <div class="fx" id="fx"></div>
-<div class="hint">коснись экрана ♡</div>
 
 <script>
 {
+  const body=document.body, NS='http://www.w3.org/2000/svg';
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const el=(t,a)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e};
+
+  // background stars
+  const st=document.getElementById('stars');
+  let h=Array.from({length:70},()=>`<i class="star" style="left:${Math.random()*100}%;top:${Math.random()*60}%;animation-delay:${Math.random()*3}s;transform:scale(${.5+Math.random()})"></i>`).join('');
+  // heart made of stars (top-right sky)
+  for(let i=0;i<28;i++){
+    const t=i/28*Math.PI*2, x=16*Math.sin(t)**3, y=-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t));
+    h+=`<i class="hstar" style="left:calc(86% + ${x*2.2}px);top:calc(14% + ${y*2.2}px);transition-delay:${4+i*.12}s"></i>`;
+  }
+  st.innerHTML=h;
+
+  // gentle music box (synthesised, no files)
+  let ctx=null, master=null, playing=false, timer=null;
+  const notes=[[659,0],[784,.5],[988,1],[880,1.5],[784,2],[659,2.5],[587,3],[659,3.5],[523,4],[659,4.5],[784,5],[659,5.5],[587,6],[523,6.5],[494,7],[523,7.5]];
+  function chime(f,t){
+    const o=ctx.createOscillator(), g=ctx.createGain(), o2=ctx.createOscillator(), g2=ctx.createGain();
+    o.type='sine';o.frequency.value=f;o2.type='sine';o2.frequency.value=f*2;
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.16,t+.02);g.gain.exponentialRampToValueAtTime(.001,t+1.8);
+    g2.gain.setValueAtTime(0,t);g2.gain.linearRampToValueAtTime(.04,t+.02);g2.gain.exponentialRampToValueAtTime(.001,t+.9);
+    o.connect(g).connect(master);o2.connect(g2).connect(master);o.start(t);o2.start(t);o.stop(t+2);o2.stop(t+1);
+  }
+  function loop(){const t0=ctx.currentTime+.1;notes.forEach(([f,d])=>chime(f,t0+d*.85));timer=setTimeout(loop,8*.85*1000)}
+  function startMusic(){
+    try{
+      ctx=new (window.AudioContext||window.webkitAudioContext)();master=ctx.createGain();master.gain.value=.7;master.connect(ctx.destination);
+      playing=true;loop();
+    }catch(e){document.getElementById('mute').style.display='none'}
+  }
+  const mute=document.getElementById('mute');
+  mute.addEventListener('click',e=>{
+    e.stopPropagation();if(!ctx)return;
+    playing=!playing;master.gain.value=playing?.7:0;mute.textContent=playing?'♪':'×';
+    mute.setAttribute('aria-label',playing?'Выключить музыку':'Включить музыку');
+  });
+
+  // bouquet
   const svg=document.getElementById('g');
-  const NS='http://www.w3.org/2000/svg';
-  // flower: x of base, top position, colour pair, delay, kind
   const F=[
     {x:360,tx:360,ty:110,c:['#ff6f91','#ffb3c6'],d:0.2,k:'rose',s:1.25},
     {x:350,tx:250,ty:170,c:['#ffb3c6','#fff0f4'],d:0.5,k:'daisy',s:1},
@@ -74,17 +159,8 @@ h1{margin:.2em 0 .25em;font:400 clamp(38px,8vw,72px)/1.08 "Marck Script",cursive
     {x:350,tx:95,ty:360,c:['#e83e6b','#ff8fab'],d:1.6,k:'rose',s:.75},
     {x:370,tx:630,ty:355,c:['#ffb3c6','#fff0f4'],d:1.7,k:'rose',s:.75}
   ];
-  const el=(t,a)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e};
-  const defs=el('defs',{});
-  defs.innerHTML='<radialGradient id="glow"><stop offset="0" stop-color="#ff6f91" stop-opacity=".35"/><stop offset="1" stop-color="#ff6f91" stop-opacity="0"/></radialGradient>';
-  svg.appendChild(defs);
-  svg.appendChild(el('ellipse',{cx:360,cy:470,rx:320,ry:120,fill:'url(#glow)'}));
-  const wrap=el('g',{class:'sway',style:'transform-origin:360px 520px'});
-  svg.appendChild(wrap);
-
   function head(f){
-    const g=el('g',{class:'head',style:`animation-delay:${f.d+1.4}s`});
-    const [a,b]=f.c, s=f.s;
+    const g=el('g',{class:'head',style:`animation-delay:${f.d+1.4}s`}), [a,b]=f.c, s=f.s;
     if(f.k==='rose'){
       for(let i=0;i<8;i++)g.appendChild(el('ellipse',{cx:f.tx,cy:f.ty-20*s,rx:15*s,ry:26*s,fill:a,opacity:.9,transform:`rotate(${i*45} ${f.tx} ${f.ty})`}));
       for(let i=0;i<5;i++)g.appendChild(el('ellipse',{cx:f.tx,cy:f.ty-11*s,rx:10*s,ry:16*s,fill:b,opacity:.85,transform:`rotate(${i*72+20} ${f.tx} ${f.ty})`}));
@@ -101,43 +177,66 @@ h1{margin:.2em 0 .25em;font:400 clamp(38px,8vw,72px)/1.08 "Marck Script",cursive
     }
     return g;
   }
-  F.forEach(f=>{
-    const by=520, cy=(by+f.ty)/2, cx=(f.x+f.tx)/2+(f.tx-f.x)*.15;
-    const endY=f.ty+(f.k==='tulip'?30*f.s:8);
-    wrap.appendChild(el('path',{class:'stem',d:`M${f.x} ${by} Q${cx} ${cy} ${f.tx} ${endY}`,style:`animation-delay:${f.d}s`}));
-    const lx=(f.x+cx)/2, ly=(by+cy)/2, dir=f.tx<f.x?-1:1;
-    wrap.appendChild(el('path',{class:'leaf',d:`M${lx} ${ly} q${dir*30} -26 ${dir*52} -8 q${-dir*26} 22 ${-dir*52} 8z`,style:`animation-delay:${f.d+.9}s`}));
-    wrap.appendChild(head(f));
-  });
-  // ribbon around the stems
-  const rib=el('g',{class:'leaf',style:'animation-delay:2.6s'});
-  rib.innerHTML='<path d="M330 470 Q360 480 390 470 L392 492 Q360 500 328 492Z" fill="#ffd58a"/><path d="M360 482 q-40 10 -50 40 q30 -6 50 -36z M360 482 q40 10 50 40 q-30 -6 -50 -36z" fill="#f2b85c"/><circle cx="360" cy="482" r="7" fill="#ffe7b3"/>';
-  wrap.appendChild(rib);
+  function grow(){
+    const defs=el('defs',{});
+    defs.innerHTML='<radialGradient id="glow"><stop offset="0" stop-color="#ff6f91" stop-opacity=".35"/><stop offset="1" stop-color="#ff6f91" stop-opacity="0"/></radialGradient>';
+    svg.appendChild(defs);
+    svg.appendChild(el('ellipse',{cx:360,cy:470,rx:320,ry:120,fill:'url(#glow)'}));
+    const wrap=el('g',{class:'sway',style:'transform-origin:360px 520px'});
+    svg.appendChild(wrap);
+    F.forEach(f=>{
+      const by=520, cy=(by+f.ty)/2, cx=(f.x+f.tx)/2+(f.tx-f.x)*.15, endY=f.ty+(f.k==='tulip'?30*f.s:8);
+      wrap.appendChild(el('path',{class:'stem',d:`M${f.x} ${by} Q${cx} ${cy} ${f.tx} ${endY}`,style:`animation-delay:${f.d}s`}));
+      const lx=(f.x+cx)/2, ly=(by+cy)/2, dir=f.tx<f.x?-1:1;
+      wrap.appendChild(el('path',{class:'leaf',d:`M${lx} ${ly} q${dir*30} -26 ${dir*52} -8 q${-dir*26} 22 ${-dir*52} 8z`,style:`animation-delay:${f.d+.9}s`}));
+      wrap.appendChild(head(f));
+    });
+    const rib=el('g',{class:'leaf',style:'animation-delay:2.6s'});
+    rib.innerHTML='<path d="M330 470 Q360 480 390 470 L392 492 Q360 500 328 492Z" fill="#ffd58a"/><path d="M360 482 q-40 10 -50 40 q30 -6 50 -36z M360 482 q40 10 50 40 q-30 -6 -50 -36z" fill="#f2b85c"/><circle cx="360" cy="482" r="7" fill="#ffe7b3"/>';
+    wrap.appendChild(rib);
+  }
 
-  // stars
-  const st=document.getElementById('stars');
-  st.innerHTML=Array.from({length:70},()=>`<i class="star" style="left:${Math.random()*100}%;top:${Math.random()*60}%;animation-delay:${Math.random()*3}s;transform:scale(${.5+Math.random()})"></i>`).join('');
-
-  // falling petals
-  const pt=document.getElementById('petals');
-  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // petals and hearts
+  const pt=document.getElementById('petals'), fx=document.getElementById('fx');
   function petal(){
-    const p=document.createElement('i');p.className='petal';
-    const dur=7+Math.random()*6;
-    p.style.cssText=`left:${Math.random()*100}%;--dx:${(Math.random()*160-80)}px;--r:${Math.random()*720-360}deg;animation-duration:${dur}s;transform:scale(${.6+Math.random()*.8})`;
+    const p=document.createElement('i');p.className='petal';const dur=7+Math.random()*6;
+    p.style.cssText=`left:${Math.random()*100}%;--dx:${Math.random()*160-80}px;--r:${Math.random()*720-360}deg;animation-duration:${dur}s;transform:scale(${.6+Math.random()*.8})`;
     pt.appendChild(p);setTimeout(()=>p.remove(),dur*1000);
   }
-  if(!reduce){setTimeout(()=>{for(let i=0;i<6;i++)petal();setInterval(petal,650)},3000)}
-
-  // tap: hearts
-  const fx=document.getElementById('fx');
-  document.addEventListener('pointerdown',e=>{
-    for(let i=0;i<6;i++){
-      const h=document.createElement('span');h.className='heart';h.textContent='♥';
-      h.style.cssText=`left:${e.clientX-10}px;top:${e.clientY-14}px;--dx:${Math.random()*120-60}px;animation-delay:${i*.06}s;color:${['#ff6f91','#ffb3c6','#ffd58a'][i%3]}`;
-      fx.appendChild(h);setTimeout(()=>h.remove(),2000);
+  function hearts(x,y,n,spread){
+    for(let i=0;i<n;i++){
+      const s=document.createElement('span');s.className='heart';s.textContent='♥';
+      const a=Math.random()*Math.PI*2, r=spread*(.4+Math.random()*.6);
+      s.style.cssText=`left:${x-10}px;top:${y-14}px;--dx:${Math.cos(a)*r}px;--dy:${Math.sin(a)*r-60}px;animation-delay:${i*.03}s;color:${['#ff6f91','#ffb3c6','#ffd58a'][i%3]}`;
+      fx.appendChild(s);setTimeout(()=>s.remove(),2200);
     }
-    if(!reduce)for(let i=0;i<4;i++)petal();
+  }
+
+  // open the envelope
+  const intro=document.getElementById('intro');let opened=false;
+  function open(){
+    if(opened)return;opened=true;
+    intro.classList.add('opening');startMusic();
+    setTimeout(()=>{body.classList.add('open');grow();
+      const lines=[...document.querySelectorAll('.line')];
+      lines.forEach((l,i)=>setTimeout(()=>l.classList.add('show'),3600+i*2200));
+      setTimeout(()=>document.getElementById('ask').classList.add('show'),3600+lines.length*2200);
+      if(!reduce)setTimeout(()=>{for(let i=0;i<6;i++)petal();setInterval(petal,650)},2500);
+    },700);
+  }
+  intro.addEventListener('click',open);
+  intro.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}});
+
+  // tap anywhere: small hearts
+  document.addEventListener('pointerdown',e=>{if(!opened||e.target.closest('button'))return;hearts(e.clientX,e.clientY,6,70);if(!reduce)for(let i=0;i<3;i++)petal()});
+
+  // the button
+  const answers=['Я так и знал ♡','Твоя улыбка — самое красивое на свете','Улыбайся чаще, Настя ♡'];let n=0;
+  document.getElementById('smile').addEventListener('click',e=>{
+    const r=e.currentTarget.getBoundingClientRect();
+    hearts(r.left+r.width/2,r.top+r.height/2,30,220);
+    document.getElementById('answer').textContent=answers[n++%answers.length];
+    if(!reduce)for(let i=0;i<12;i++)petal();
   });
 }
 </script>
